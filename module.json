@@ -9,8 +9,8 @@
     }
   ],
   "url": "https://github.com/siller94-art/foundry-homebrew-importer",
-  "manifest": "https://github.com/siller94-art/foundry-homebrew-importer/releases/latest/download/module.json",
-  "download": "https://github.com/siller94-art/foundry-homebrew-importer/releases/download/v2.1.0/homebrew-importer.zip",
+  "manifest": "https://raw.githubusercontent.com/siller94-art/foundry-homebrew-importer/main/module.json",
+  "download": "https://github.com/siller94-art/foundry-homebrew-importer/archive/refs/heads/main.zip",
   "readme": "https://github.com/siller94-art/foundry-homebrew-importer#readme",
   "bugs": "https://github.com/siller94-art/foundry-homebrew-importer/issues",
   "license": "MIT",

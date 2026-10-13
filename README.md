@@ -8,7 +8,7 @@ Works with both **2014** and **2024** layouts. Built for **Foundry v13–v14** a
 1. In Foundry's setup screen open **Add-on Modules → Install Module**.
 2. Paste this into **Manifest URL** and click **Install**:
    ```
-   https://github.com/siller94-art/foundry-homebrew-importer/releases/latest/download/module.json
+   https://raw.githubusercontent.com/siller94-art/foundry-homebrew-importer/main/module.json
    ```
 3. Enable **Homebrew Importer (D&D 5e)** in your world. The **Items** sidebar gets an **Import Homebrew** button.
 
