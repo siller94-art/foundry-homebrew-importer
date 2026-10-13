@@ -11,7 +11,8 @@ const DEFAULT_IMG = {
   race: "icons/svg/mystery-man.svg",
   class: "icons/svg/sword.svg",
   subclass: "icons/svg/sword.svg",
-  feat: "icons/svg/book.svg"
+  feat: "icons/svg/book.svg",
+  background: "icons/sundries/documents/document-sealed-signatures-red.webp"
 };
 
 const SCHOOLS = {
@@ -301,14 +302,14 @@ function buildFeature(f, ctx, kind, requirements) {
 }
 
 /** Create/update feature items and return ItemGrant advancements grouped by level. */
-async function grantFeatures(list, ctx, kind, reqFn, defaultLevel, parent) {
+async function grantFeatures(list, ctx, kind, reqFn, defaultLevel, parent, folder = "Features") {
   const byLevel = new Map();
   for (const f of arr(list)) {
     const level = Number(f.level ?? defaultLevel);
     const fe = { rules: parent.rules, book: parent.book, ...f };
     const data = buildFeature(fe, ctx, kind, reqFn?.(level));
     const owner = `${slugify(parent.name)}:${data.system?.source?.rules ?? ""}`;
-    const doc = await upsert(data, ctx, "Features", owner);
+    const doc = await upsert(data, ctx, folder, owner);
     if (!byLevel.has(level)) byLevel.set(level, []);
     byLevel.get(level).push({ uuid: doc.uuid, optional: !!f.optional });
   }
@@ -449,6 +450,67 @@ async function buildSubclass(e, ctx) {
   };
 }
 
+/** Find a feat by name: one imported in this run, a world item, then any Item compendium (2024 packs first for 2024). */
+async function findFeat(name, rules, ctx) {
+  const full = lc(name), base = lc(name.replace(/\s*\([^)]*\)\s*$/, ""));
+  const match = n => [full, base].includes(lc(n));
+  for (const doc of ctx.existing.values()) if (doc.type === "feat" && match(doc.name)) return doc.uuid;
+  const world = game.items.find(i => i.type === "feat" && match(i.name));
+  if (world) return world.uuid;
+  const packs = game.packs.filter(p => p.documentName === "Item")
+    .sort((a, b) => Number(/24\b|2024/.test(b.collection) === (rules === "2024")) - Number(/24\b|2024/.test(a.collection) === (rules === "2024")));
+  for (const pack of packs) {
+    const index = await pack.getIndex({ fields: ["type"] });
+    const hit = index.find(i => i.type === "feat" && match(i.name));
+    if (hit) return hit.uuid ?? `Compendium.${pack.collection}.Item.${hit._id}`;
+  }
+  return null;
+}
+
+async function buildBackground(e, ctx) {
+  const L = 0;
+  const adv = [];
+  const sys = common(e, ctx);
+
+  if (e.abilities?.length) {
+    const all = ["str", "dex", "con", "int", "wis", "cha"];
+    adv.push({
+      _id: rid(), type: "AbilityScoreImprovement", level: L, title: "Background Ability Score Improvement",
+      configuration: { points: 3, cap: 2, fixed: Object.fromEntries(all.map(a => [a, 0])), locked: all.filter(a => !e.abilities.includes(a)) }
+    });
+  }
+
+  const grants = [...arr(e.skills).map(skill), ...arr(e.tools).map(t => (t.startsWith("tool:") ? t : `tool:${t}`))];
+  const choices = [
+    ...(e.skillChoices ? [{ count: Number(e.skillChoices), pool: ["skills:*"] }] : []),
+    ...arr(e.toolChoices).map(c => ({ count: Number(c.count ?? 1), pool: arr(c.pool) }))
+  ];
+  if (grants.length || choices.length) adv.push(trait(L, grants, choices, "Background Proficiencies"));
+
+  const langs = arr(e.languages).map(languageKey);
+  const langChoices = e.languageChoices ? [{ count: Number(e.languageChoices), pool: ["languages:*"] }] : [];
+  if (langs.length || langChoices.length) adv.push(trait(L, langs, langChoices, "Languages"));
+
+  if (e.feat) {
+    const uuid = await findFeat(e.feat, sys.source.rules, ctx);
+    if (uuid) adv.push({ _id: rid(), type: "ItemGrant", level: L, title: "Background Feat", configuration: { items: [{ uuid, optional: false }], optional: false, spell: null } });
+    else ctx.report.warnings.push(`${e.name}: feat "${e.feat}" wasn't found in your world or compendiums. Import it first, then re-import the background (or add it on the sheet).`);
+  }
+
+  adv.push(...await grantFeatures(e.features, ctx, "background", null, L, e, "Background Features"));
+
+  return {
+    name: e.name, type: "background", img: e.img ?? DEFAULT_IMG.background,
+    system: {
+      ...sys,
+      identifier: slugify(e.identifier ?? e.name),
+      advancement: adv,
+      startingEquipment: [],
+      wealth: e.wealth ? String(e.wealth) : ""
+    }
+  };
+}
+
 function buildFeat(e, ctx) {
   const data = buildFeature(e, ctx, "feat", e.prerequisite);
   if (!e.system) data.system.type.subtype = FEAT_CATEGORIES[lc(e.category)] ?? "";
@@ -506,6 +568,7 @@ const STEPS = [
   ["spells", "Spells", buildSpell, "spell"],
   ["races", "Species", buildRace, "race"],
   ["species", "Species", buildRace, "race"],
+  ["backgrounds", "Backgrounds", buildBackground, "background"],
   ["classes", "Classes", buildClass, "class"],
   ["subclasses", "Subclasses", buildSubclass, "subclass"],
   ["items", "Other", e => raw(e), null]
@@ -535,7 +598,7 @@ export async function importHomebrew(input, { target = "world", update = true } 
     rootName: source.folder ?? `Homebrew – ${source.book ?? "Imported"}`,
     rootFolderId: null, folderIds: {},
     existing: await indexExisting(pack),
-    report: { created: 0, updated: 0, skipped: 0, errors: [] }
+    report: { created: 0, updated: 0, skipped: 0, errors: [], warnings: [] }
   };
 
   for (const [key, folder, build, type] of STEPS) {

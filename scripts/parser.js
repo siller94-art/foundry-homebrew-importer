@@ -424,6 +424,103 @@ function parseFeat(lines) {
   return { kind: "feat", data: e, rules, found, warnings };
 }
 
+
+/* -------------------------------------------- */
+/*  Backgrounds                                 */
+/* -------------------------------------------- */
+
+/** Tool names as printed → dnd5e trait keys ("tool:art:calligrapher", "tool:thief"). */
+const TOOL_KEYS = [
+  ["alchemist", "art:alchemist"], ["brewer", "art:brewer"], ["calligrapher", "art:calligrapher"], ["carpenter", "art:carpenter"],
+  ["cartographer", "art:cartographer"], ["cobbler", "art:cobbler"], ["cook", "art:cook"], ["glassblower", "art:glassblower"],
+  ["jeweler", "art:jeweler"], ["leatherworker", "art:leatherworker"], ["mason", "art:mason"], ["painter", "art:painter"],
+  ["potter", "art:potter"], ["smith", "art:smith"], ["tinker", "art:tinker"], ["weaver", "art:weaver"], ["woodcarver", "art:woodcarver"],
+  ["dice", "game:dice"], ["dragonchess", "game:chess"], ["playing card", "game:card"],
+  ["bagpipes", "music:bagpipes"], ["drum", "music:drum"], ["dulcimer", "music:dulcimer"], ["pan flute", "music:panflute"],
+  ["flute", "music:flute"], ["horn", "music:horn"], ["lute", "music:lute"], ["lyre", "music:lyre"], ["shawm", "music:shawm"], ["viol", "music:viol"],
+  ["disguise", "disg"], ["forgery", "forg"], ["herbalism", "herb"], ["navigator", "navg"], ["poisoner", "pois"], ["thieves", "thief"]
+];
+
+/** "Calligrapher's Supplies", "one type of Gaming Set", "a musical instrument of your choice" → { grants, choices, unmapped } */
+export function parseTools(text) {
+  const grants = [], choices = [], unmapped = [];
+  for (let part of String(text ?? "").split(/,|;|\band\b/)) {
+    part = part.trim();
+    if (!part || /^none\b/i.test(part)) continue;
+    const t = lc(part);
+    const choice = t.match(/\b(one|two|any|a)\b.*?\b(gaming set|artisan'?s tools?|musical instrument|instrument|kind|type)\b/) || /of your choice/.test(t);
+    if (choice) {
+      const count = num(t.match(/\b(one|two|three)\b/)?.[1] ?? "1") || 1;
+      const pool = /gaming/.test(t) ? "tool:game:*" : /artisan/.test(t) ? "tool:art:*" : /instrument/.test(t) ? "tool:music:*" : "tool:*";
+      choices.push({ count, pool: [pool] });
+      continue;
+    }
+    const hit = TOOL_KEYS.find(([n]) => t.includes(n));
+    if (hit) grants.push(`tool:${hit[1]}`); else unmapped.push(part);
+  }
+  return { grants: unique(grants), choices, unmapped };
+}
+
+const BG_FIELD = /^(ability scores|feat|skill proficiencies|skills|tool proficienc(?:y|ies)|tools|languages?|equipment|starting equipment|feature)\s*:\s*(.*)$/i;
+
+function parseBackground(lines) {
+  const found = [], warnings = [];
+  const body = lines.filter(l => l !== SPLIT);
+  const name = body.find(Boolean) ?? "Unnamed background";
+  const e = { name, features: [] };
+  let rules = null;
+  const lore = [];
+  let feature = null;
+
+  for (const l of body.slice(body.indexOf(name) + 1)) {
+    if (!l) continue;
+    const m = l.match(BG_FIELD);
+    if (!m) {
+      if (feature) feature.description += (feature.description ? "\n\n" : "") + l;
+      else lore.push(l);
+      continue;
+    }
+    const key = lc(m[1]), val = m[2].trim();
+    if (key === "ability scores") {
+      e.abilities = findAbilities(val); rules = "2024";
+      found.push(`Ability scores ${e.abilities.join("/")}`);
+    } else if (key === "feat") {
+      e.feat = val.replace(/\s*\((?:see|from)\b[^)]*\)\s*$/i, "").trim(); rules = "2024";
+      found.push(`Feat ${e.feat}`);
+    } else if (key.startsWith("skill")) {
+      e.skills = findSkills(val);
+      const c = val.match(/\b(one|two|three)\b[^,.]*?(?:of your choice|skills?)/i);
+      if (c && !e.skills.length) e.skillChoices = num(c[1]);
+      found.push(`Skills ${e.skills.join(", ") || `choose ${e.skillChoices}`}`);
+    } else if (key.startsWith("tool")) {
+      const t = parseTools(val);
+      e.tools = t.grants; e.toolChoices = t.choices;
+      if (t.unmapped.length) warnings.push(`Tool proficiency not recognised (add by hand): ${t.unmapped.join(", ")}`);
+      if (t.grants.length || t.choices.length) found.push("Tools");
+    } else if (key.startsWith("language")) {
+      const labels = languageLabels();
+      e.languages = Object.keys(labels).filter(x => new RegExp(`\\b${x}\\b`, "i").test(val)).map(x => labels[x]);
+      const c = val.match(/\b(one|two|three)\b/i);
+      if (c && /choice|other|extra|additional/i.test(val)) e.languageChoices = num(c[1]);
+      rules ??= "2014";
+      found.push("Languages");
+    } else if (key.includes("equipment")) {
+      e.equipment = val;
+      const gp = val.match(/\(B\)\s*(\d+)\s*GP/i) ?? val.match(/\bor\s+(\d+)\s*GP\s*$/i);
+      if (gp) e.wealth = gp[1];
+      found.push(e.wealth ? `Equipment or ${e.wealth} GP` : "Equipment");
+    } else if (key === "feature") {
+      feature = { name: val.replace(/[.:]$/, ""), description: "" };
+      e.features.push(feature); rules ??= "2014";
+      found.push(`Feature ${feature.name}`);
+    }
+  }
+  e.description = [...lore, ...(e.equipment ? [`**Equipment:** ${e.equipment}`] : [])].join("\n\n");
+  if (!e.skills?.length && !e.skillChoices) warnings.push("No skill proficiencies found");
+  if (e.equipment) warnings.push("Starting equipment is kept as text: set up the equipment choices on the sheet if you want them offered");
+  return { kind: "background", data: e, rules, found, warnings };
+}
+
 /* -------------------------------------------- */
 /*  Detection and entry point                   */
 /* -------------------------------------------- */
@@ -436,6 +533,8 @@ export function detectType(lines) {
   if (/^(origin|general|fighting style|epic boon)\s+feat\b/im.test(top)) return "feat";
   if (/^(hit point die|hit dice|saving throw proficiencies|saving throws)\s*:/im.test(all)) return "class";
   if (/\bsubclass\b/i.test(top)) return "subclass";
+  if (/^ability scores\s*:/im.test(all) && /^(feat|skill proficiencies)\s*:/im.test(all)) return "background";
+  if (/^skill proficiencies\s*:/im.test(all) && /^(feature|equipment|languages|tool proficienc(?:y|ies))\s*:/im.test(all)) return "background";
   if (/^(creature type|ability score increase|size|speed)\s*[.:]/im.test(all)) return "species";
   if (/^prerequisites?\s*:/im.test(top)) return "feat";
   if (/^level\s+\d+\s*:/im.test(all)) return "subclass";
@@ -450,13 +549,13 @@ function splitSpells(lines) {
   return starts.map((s, i) => lines.slice(s, starts[i + 1] ?? lines.length));
 }
 
-const PARSERS = { spell: parseSpell, species: parseSpecies, class: parseClass, subclass: parseSubclass, feat: parseFeat };
+const PARSERS = { spell: parseSpell, species: parseSpecies, class: parseClass, subclass: parseSubclass, feat: parseFeat, background: parseBackground };
 
 /**
  * Parse pasted text.
  * @param {string} raw
  * @param {object} [opts]
- * @param {"auto"|"spell"|"species"|"class"|"subclass"|"feat"} [opts.type="auto"]
+ * @param {"auto"|"spell"|"species"|"class"|"subclass"|"feat"|"background"} [opts.type="auto"]
  * @param {"auto"|"2014"|"2024"} [opts.rules="auto"]
  * @param {string} [opts.className]   Parent class for subclasses whose text doesn't name one.
  * @returns {{kind:string,data:object,rules:string,found:string[],warnings:string[]}[]}
@@ -498,7 +597,7 @@ export function parseText(raw, { type = "auto", rules = "auto", className = "" }
 
 /** Turn parse results into the importer's payload shape. */
 export function toPayload(results, source = {}) {
-  const key = { spell: "spells", species: "species", class: "classes", subclass: "subclasses", feat: "feats" };
+  const key = { spell: "spells", species: "species", class: "classes", subclass: "subclasses", feat: "feats", background: "backgrounds" };
   const payload = { source };
   for (const r of results) {
     if (!r.kind) continue;

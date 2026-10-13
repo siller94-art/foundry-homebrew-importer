@@ -85,3 +85,20 @@ Storm Covenant
 At 3rd level, choose a covenant that shapes your power.
 Ability Score Improvement
 When you reach 4th level, you can increase one ability score by 2. You can do so again at 8th, 12th, 16th, and 19th level.
+---
+Reef Diver
+Ability Scores: Strength, Dexterity, Constitution
+Feat: Sea Legs (see chapter 5)
+Skill Proficiencies: Athletics and Survival
+Tool Proficiency: Navigator's Tools
+Equipment: Choose A or B: (A) Navigator's Tools, Net, Diving Knife, Traveler's Clothes, 12 GP; or (B) 50 GP
+You grew up diving the coral shelves for pearls and salvage.
+---
+Harbor Smuggler
+Skill Proficiencies: Deception, Stealth
+Tool Proficiencies: One type of gaming set, thieves' tools
+Languages: One of your choice
+Equipment: A crowbar, a set of dark common clothes with a hood, and a belt pouch containing 15 gp
+Feature: Hidden Coves
+You know a dozen quiet landings along the coast where a boat can put in unseen.
+You can find passage for yourself and your companions on smugglers' ships.

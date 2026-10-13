@@ -1,6 +1,6 @@
 # Homebrew Importer (D&D 5e) — Foundry VTT module
 
-Paste homebrew **spells, species/races, classes, subclasses and feats** straight from a PDF, a website
+Paste homebrew **spells, species/races, backgrounds, classes, subclasses and feats** straight from a PDF, a website
 or Homebrewery, press **Parse**, check what was detected, and import them as ready-to-use dnd5e items.
 Works with both **2014** and **2024** layouts. Built for **Foundry v13–v14** and **dnd5e 5.3 / 6.x**.
 
@@ -29,9 +29,17 @@ See `examples/example-paste.txt` for sample text in both editions.
 |---|---|---|
 | Spell | `3rd-level evocation`, `Level 3 Evocation (Wizard)`, `Evocation Cantrip` | Casting time, range, components, duration, ritual, saves, spell attacks, damage, healing, area, higher-level scaling, class list |
 | Species | `Creature Type:`, `Size`, `Speed`, `Ability Score Increase.` | Type, size, speeds, darkvision, languages, resistances, skills, 2014 ability increases, every trait as a feature |
+| Background | `Ability Scores:` + `Feat:` (2024), or `Skill Proficiencies:` + `Feature:`/`Equipment:` (2014) | Ability score choice, skill and tool proficiencies, languages, origin feat (linked from your world or compendiums), 2014 feature, the "or 50 GP" wealth option |
 | Class | `Hit Point Die:` / `Hit Dice:`, `Saving Throws` | Hit die, saves, skills, armor and weapons, spellcasting, subclass level, ASI levels, features by level (`Level 3: X` or "At 3rd level…") |
 | Subclass | `Barbarian Subclass` line or the Parent class box | Features by level, third-caster spellcasting |
 | Feat | `Origin Feat`, `General Feat (Prerequisite: …)`, `Prerequisite:` | Category, prerequisite, description |
+
+Imported content is sorted into folders under **Homebrew – <source book>**: Spells, Species, Backgrounds, Classes,
+Subclasses, Feats, Features (class and species features) and Background Features.
+
+A 2024 background's feat is linked automatically when a feat with that name exists in the same paste, your
+world, or any compendium (the SRD feats included). If it isn't found, the import finishes with a note telling
+you which feat to import first. Starting equipment stays as text in the description.
 
 Pasting the module's JSON format (below) instead of text also works and skips the parser.
 

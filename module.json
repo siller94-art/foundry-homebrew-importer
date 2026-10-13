@@ -1,8 +1,8 @@
 {
   "id": "homebrew-importer",
   "title": "Homebrew Importer (D&D 5e)",
-  "description": "Paste homebrew spells, species/races, classes, subclasses and feats straight from a PDF, website or Homebrewery, check what was detected, and import them as ready-to-use dnd5e items. Handles 2014 and 2024 layouts.",
-  "version": "2.1.0",
+  "description": "Paste homebrew spells, species/races, backgrounds, classes, subclasses and feats straight from a PDF, website or Homebrewery, check what was detected, and import them as ready-to-use dnd5e items. Handles 2014 and 2024 layouts.",
+  "version": "2.2.0",
   "authors": [
     {
       "name": "siller94-art"

@@ -3,10 +3,10 @@ import { parseText, toPayload } from "./parser.js";
 
 const { ApplicationV2 } = foundry.applications.api;
 
-const KIND_LABEL = { spell: "Spell", species: "Species", class: "Class", subclass: "Subclass", feat: "Feat" };
-const KIND_ICON = { spell: "fa-wand-sparkles", species: "fa-person", class: "fa-shield-halved", subclass: "fa-code-branch", feat: "fa-star" };
+const KIND_LABEL = { spell: "Spell", species: "Species", background: "Background", class: "Class", subclass: "Subclass", feat: "Feat" };
+const KIND_ICON = { spell: "fa-wand-sparkles", species: "fa-person", background: "fa-scroll", class: "fa-shield-halved", subclass: "fa-code-branch", feat: "fa-star" };
 
-const PLACEHOLDER = `Paste spells, species, classes, subclasses or feats here — straight from a PDF, website or Homebrewery.
+const PLACEHOLDER = `Paste spells, species, backgrounds, classes, subclasses or feats here — straight from a PDF, website or Homebrewery.
 
 Fireball
 3rd-level evocation
@@ -192,6 +192,10 @@ export class HomebrewImporterApp extends ApplicationV2 {
     btn.disabled = false;
 
     const msg = `Created ${report.created}, updated ${report.updated}, skipped ${report.skipped}.`;
+    if (report.warnings?.length) {
+      this.element.querySelector(".hbi-preview").insertAdjacentHTML("afterbegin",
+        `<article class="hbi-card hbi-bad"><header><strong>Imported, with notes</strong></header><ul class="hbi-warnings">${report.warnings.map(w => `<li><i class="fas fa-triangle-exclamation"></i>${escapeHTML(w)}</li>`).join("")}</ul></article>`);
+    }
     if (report.errors.length) {
       ui.notifications.warn(`${msg} ${report.errors.length} error(s) — see the list in the window.`);
       this.element.querySelector(".hbi-preview").insertAdjacentHTML("afterbegin",
