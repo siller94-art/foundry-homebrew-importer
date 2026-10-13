@@ -1,0 +1,108 @@
+{
+  "source": { "book": "Example Homebrew", "rules": "2024" },
+
+  "spells": [
+    {
+      "name": "Tidal Lance",
+      "level": 2,
+      "school": "evocation",
+      "castingTime": "1 action",
+      "range": "Self (60-foot line)",
+      "components": "V, S, M (a shard of sea glass)",
+      "duration": "Instantaneous",
+      "save": { "ability": "dex", "onSave": "half" },
+      "damage": [{ "dice": "3d8", "type": "cold", "scaling": "1d8" }],
+      "description": "A spear of pressurised seawater erupts from your hand in a 60-foot-long, 5-foot-wide line. Each creature in the line makes a Dexterity saving throw, taking 3d8 Cold damage on a failed save or half as much on a successful one.\n\nA creature that fails is also pushed 10 feet away from you.",
+      "higherLevels": "The damage increases by 1d8 for each spell slot level above 2.",
+      "classes": ["Sorcerer", "Wizard", "Druid"]
+    },
+    {
+      "name": "Brine Bolt",
+      "level": 0,
+      "school": "conjuration",
+      "castingTime": "1 action",
+      "range": "90 feet",
+      "components": "V, S",
+      "duration": "Instantaneous",
+      "attack": "ranged",
+      "damage": ["1d10 acid"],
+      "description": "You hurl a globule of caustic brine. Make a ranged spell attack. On a hit, the target takes 1d10 Acid damage.",
+      "higherLevels": "The damage increases by 1d10 when you reach levels 5 (2d10), 11 (3d10), and 17 (4d10)."
+    },
+    {
+      "name": "Kelp Mending",
+      "level": 1,
+      "school": "abjuration",
+      "castingTime": "1 bonus action",
+      "range": "Touch",
+      "components": { "verbal": true, "somatic": true },
+      "duration": "Instantaneous",
+      "healing": { "dice": "1d8", "scaling": "1d8" },
+      "description": "Living kelp knits a creature's wounds. The target regains Hit Points equal to 1d8 plus your spellcasting ability modifier."
+    }
+  ],
+
+  "species": [
+    {
+      "name": "Coralborn",
+      "creatureType": "humanoid",
+      "size": ["medium", "small"],
+      "speed": { "walk": 30, "swim": 30 },
+      "senses": { "darkvision": 60 },
+      "languages": ["common", "primordial"],
+      "languageChoices": 1,
+      "resistances": ["cold"],
+      "description": "Coralborn are people whose skin bears living reef patterns.",
+      "features": [
+        { "name": "Amphibious", "description": "You can breathe air and water." },
+        { "name": "Reef Skin", "description": "When you aren't wearing armor, your AC equals 13 + your Dexterity modifier." },
+        { "name": "Tidecall", "description": "As a Magic action you cast *Fog Cloud*.", "uses": { "max": "1", "recovery": "lr" } }
+      ]
+    }
+  ],
+
+  "classes": [
+    {
+      "name": "Tidewarden",
+      "hitDie": "d10",
+      "primaryAbility": ["wis", "con"],
+      "savingThrows": ["con", "wis"],
+      "armor": ["light", "medium", "shields"],
+      "weapons": ["simple", "martial"],
+      "skills": { "count": 2, "from": ["Athletics", "Insight", "Nature", "Perception", "Survival"] },
+      "multiclass": { "armor": ["light", "shields"], "weapons": ["martial"] },
+      "spellcasting": { "progression": "half", "ability": "wis" },
+      "subclassLevel": 3,
+      "subclassTitle": "Warden Oath",
+      "scaleValues": [
+        { "title": "Surge Die", "values": { "1": "d6", "5": "d8", "11": "d10", "17": "d12" } }
+      ],
+      "description": "Wardens of the shoreline who channel the sea's patience and fury.",
+      "features": [
+        { "level": 1, "name": "Undertow", "description": "Once per turn when you hit with a weapon attack, roll your Surge Die (@scale.tidewarden.surge-die) and add it to the damage.", "uses": { "max": "@prof", "recovery": "lr" } },
+        { "level": 2, "name": "Fighting Style", "description": "You gain a Fighting Style feat of your choice." },
+        { "level": 5, "name": "Extra Attack", "description": "You can attack twice instead of once whenever you take the Attack action on your turn." }
+      ]
+    }
+  ],
+
+  "subclasses": [
+    {
+      "name": "Oath of the Deep",
+      "class": "Tidewarden",
+      "description": "Wardens sworn to the lightless trenches.",
+      "features": [
+        { "level": 3, "name": "Crushing Depths", "description": "When you use Undertow, the target's Speed is reduced by 10 feet until the start of your next turn." },
+        { "level": 7, "name": "Pressure Adapted", "description": "You gain resistance to Bludgeoning damage." }
+      ]
+    }
+  ],
+
+  "feats": [
+    {
+      "name": "Sea Legs",
+      "category": "origin",
+      "description": "You gain a Swim Speed equal to your Speed, and you have Advantage on saving throws to avoid being knocked Prone while on a ship."
+    }
+  ]
+}

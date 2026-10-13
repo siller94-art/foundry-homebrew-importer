@@ -1,0 +1,87 @@
+Tidal Lance
+2nd-level evocation
+Casting Time: 1 action
+Range: Self (60-foot line)
+Components: V, S, M (a shard of sea
+glass)
+Duration: Instantaneous
+A spear of pressurised seawater erupts from your hand. Each creature in the line must make a Dexterity saving throw. A creature takes 3d8 cold damage on a failed save, or half as much damage on a successful one.
+At Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, the damage increases by 1d8 for each slot level above 2nd.
+
+Brine Bolt
+Conjuration Cantrip (Sorcerer, Wizard)
+Casting Time: Action
+Range: 90 feet
+Components: V, S
+Duration: Instantaneous
+Make a ranged spell attack. On a hit, the target takes 1d10 Acid damage.
+Cantrip Upgrade. The damage increases by 1d10 when you reach levels 5, 11, and 17.
+---
+#### Coralborn
+*Creature Type:* Humanoid
+**Size:** Medium (about 4-7 feet tall) or Small
+**Speed:** 30 feet
+As a Coralborn, you have these special traits.
+***Amphibious.*** You can breathe air and water, and you have a Swim Speed equal to your Speed.
+***Darkvision.*** You have Darkvision with a range of 60 feet.
+***Reef Skin.*** You have Resistance to Cold damage.
+---
+Hill Dwarf
+Ability Score Increase. Your Constitution score increases by 2, and your Wisdom score increases by 1.
+Age. Dwarves live long.
+Size. Dwarves stand between 4 and 5 feet tall. Your size is Medium.
+Speed. Your base walking speed is 25 feet.
+Darkvision. You can see in dim light within 60 feet of you.
+Languages. You can speak, read, and write Common and Dwarvish.
+---
+Tidewarden
+Primary Ability: Wisdom
+Hit Point Die: D10 per Tidewarden level
+Saving Throw Proficiencies: Constitution and Wisdom
+Skill Proficiencies: Choose 2: Athletics, Insight, Nature, or Survival
+Weapon Proficiencies: Simple and Martial weapons
+Armor Training: Light and Medium armor and Shields
+Wardens of the shoreline.
+Level 1: Spellcasting
+Wisdom is your spellcasting ability for your Tidewarden spells.
+Level 1: Undertow
+Once per turn, add 1d6.
+Level 3: Tidewarden Subclass
+You gain a Tidewarden subclass of your choice.
+Level 4: Ability Score Improvement
+You gain the Ability Score Improvement feat.
+Level 8: Ability Score Improvement
+Again.
+Level 5: Extra Attack
+You attack twice.
+---
+Oath of the Deep
+Tidewarden Subclass
+Wardens sworn to the trenches.
+Level 3: Crushing Depths
+Speed drops by 10 feet.
+Level 7: Pressure Adapted
+Resistance to bludgeoning.
+---
+Sea Legs
+Origin Feat
+You gain the following benefits.
+Swim Speed. You gain a Swim Speed equal to your Speed.
+---
+Stormcaller
+Class Features
+Hit Dice: 1d8 per stormcaller level
+Hit Points at 1st Level: 8 + your Constitution modifier
+Armor: Light armor
+Weapons: Simple weapons
+Tools: None
+Saving Throws: Wisdom, Charisma
+Skills: Choose two from Arcana, History, Nature, and Religion
+Spellcasting
+You can cast stormcaller spells. Charisma is your spellcasting ability for your stormcaller spells.
+Thunder Step
+Starting at 2nd level, you can teleport 30 feet as a bonus action.
+Storm Covenant
+At 3rd level, choose a covenant that shapes your power.
+Ability Score Improvement
+When you reach 4th level, you can increase one ability score by 2. You can do so again at 8th, 12th, 16th, and 19th level.
