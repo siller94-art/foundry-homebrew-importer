@@ -102,3 +102,6 @@ Descriptions accept plain text (blank line = new paragraph, `**bold**`, `*italic
   or via raw `system`/`effects` passthrough.
 - dnd5e changes its data model between major versions; if a field is ignored after a system update,
   check the console and adjust the matching builder in `scripts/importer.js`.
+
+## Development
+After changing anything, run `./build.sh` and commit `homebrew-importer.zip`: that zip is what Foundry downloads.
